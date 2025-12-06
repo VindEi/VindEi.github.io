@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const is404 = route === "/404.html";
 
     // --- TOGGLE UI ---
-    // If 404, hide header/footer. Else show them.
     if (header) header.style.display = is404 ? "none" : "block";
     if (footer) footer.style.display = is404 ? "none" : "block";
 
@@ -51,13 +50,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // --- 404 SCRIPT HANDLER ---
       if (is404) {
-        // We must manually execute the script because innerHTML won't run it
-        // We remove the old script if it exists to allow re-running
+        // Remove old script if exists
         const oldScript = document.getElementById("error-script");
         if (oldScript) oldScript.remove();
 
+        // Create new script with TIMESTAMP to force re-execution
         const script = document.createElement("script");
-        script.src = "/assets/js/error.js";
+        script.src = "/assets/js/error.js?v=" + new Date().getTime(); // <--- THE FIX
         script.id = "error-script";
         document.body.appendChild(script);
       } else {

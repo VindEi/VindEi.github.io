@@ -1,32 +1,20 @@
 (async function initErrorPage() {
-  // Elements
-  const lines = [
-    { el: document.querySelector(".error-top-box"), text: "ERROR 404" },
-    {
-      el: document.querySelector(".error-message"),
-      text: "The page you are looking for does not exist.",
-    },
-    {
-      el: document.querySelector(".error-details"),
-      text: "Check the URL or press any key to return.",
-    },
-    {
-      el: document.querySelector(".prompt-text"),
-      text: "Press any key to continue",
-    },
+  // Select all elements that have data-text attributes
+  const elements = [
+    document.querySelector(".error-top-box"),
+    document.querySelector(".error-message"),
+    document.querySelector(".error-details"),
+    document.querySelector(".prompt-text"),
   ];
 
-  // Safety Check
-  if (!lines[0].el) return;
+  // Safety Check: If HTML isn't loaded yet, stop
+  if (!elements[0]) return;
 
-  // Clear text for typing effect
-  lines.forEach((line) => (line.el.textContent = ""));
-
-  // Create Blinking Cursor
+  // Prepare Cursor
   const cursor = document.createElement("span");
   cursor.textContent = "_";
   cursor.style.cssText =
-    "display:inline; animation: blink 0.7s steps(1) infinite;";
+    "display:inline-block; animation: blink 0.7s steps(1) infinite; color: inherit;";
 
   // Inject Keyframes if missing
   if (!document.getElementById("bsod-cursor-style")) {
@@ -36,35 +24,44 @@
     document.head.appendChild(style);
   }
 
-  // Typing Loop
-  for (let line of lines) {
-    if (!document.body.contains(line.el)) return; // Stop if user left page
-    line.el.appendChild(cursor);
-    for (let char of line.text) {
-      line.el.insertBefore(document.createTextNode(char), cursor);
-      await new Promise((r) => setTimeout(r, 40));
-    }
-    if (line !== lines[lines.length - 1]) line.el.removeChild(cursor);
-  }
+  // Clear initial content and start typing loop
+  for (let el of elements) {
+    if (!el) continue;
 
-  // Keep cursor at the end
-  lines[lines.length - 1].el.appendChild(cursor);
+    // Get text from the HTML attribute
+    const textToType = el.getAttribute("data-text") || "";
+    el.textContent = ""; // Clear it
+
+    el.appendChild(cursor);
+
+    // Type character by character
+    for (let char of textToType) {
+      if (!document.body.contains(el)) return; // Stop if user left page
+      el.insertBefore(document.createTextNode(char), cursor);
+      // Fast typing speed
+      await new Promise((r) => setTimeout(r, 20));
+    }
+
+    // Remove cursor from this line (unless it's the last one)
+    if (el !== elements[elements.length - 1]) {
+      el.removeChild(cursor);
+    }
+  }
 
   // Return Home Logic
   let inputActive = false;
+  // Wait 1 second before allowing exit
   setTimeout(() => {
     inputActive = true;
-  }, 1000);
+  }, 500);
 
   const goHome = () => {
     if (!inputActive) return;
     window.removeEventListener("keydown", goHome);
     window.removeEventListener("click", goHome);
 
-    // Redirect via Router (assuming router exposes loadPage or we just use href)
-    // Since this is a standalone script, we update location or trigger a click
+    // Trigger Router
     window.history.pushState(null, null, "/");
-    // Trigger popstate to notify router
     window.dispatchEvent(new Event("popstate"));
   };
 
