@@ -1,0 +1,51 @@
+/* --- GLOBAL CURSOR RESET --- */
+html,
+body,
+a,
+button,
+input {
+  cursor: none !important;
+}
+
+/* --- CUSTOM CURSOR ELEMENT --- */
+#sticky-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+
+  /* Default State */
+  background-color: #fff;
+  mix-blend-mode: normal;
+  transition: opacity 0.2s, background-color 0.2s, border-color 0.2s;
+}
+
+/* --- LOCKED STATE --- /
+/ Triggered when hovering interactive elements */
+#sticky-cursor.is-locked {
+  background-color: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* --- THEME ADJUSTMENTS --- */
+
+/* Light Theme */
+body.light-theme #sticky-cursor {
+  background-color: #000;
+}
+
+body.light-theme #sticky-cursor.is-locked {
+  background-color: transparent !important;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow: none;
+}
+
+/* Dark Theme Glow */
+body:not(.light-theme) #sticky-cursor {
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}

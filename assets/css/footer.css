@@ -1,0 +1,53 @@
+/* --- FOOTER LAYOUT --- */
+footer {
+  position: relative;
+  width: 100%;
+  padding: 1rem 0;
+
+  /* Alignment & Typography */
+  text-align: center;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+
+  /* Visibility & Stacking */
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  z-index: 10;
+
+  /* Push to bottom of flex container */
+  margin-top: auto;
+}
+
+footer:hover {
+  opacity: 1;
+}
+
+/* --- SOCIAL LINKS --- */
+footer .socials {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+footer .socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  /* Magnetic Cursor Padding */
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text);
+  transition: color 0.2s;
+}
+
+footer .socials a:hover {
+  color: var(--accent-gold);
+}

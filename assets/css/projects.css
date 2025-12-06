@@ -1,0 +1,218 @@
+/* --- MAIN LAYOUT --- */
+.projects-container {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3rem;
+
+  /* Fixed height calculation to handle footer/header spacing */
+  height: calc(100vh - 280px);
+
+  overflow: hidden;
+  align-items: start;
+}
+
+/* --- DETAIL PANEL (Left) --- */
+.project-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 2rem;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes focusReveal {
+  0% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+.fade-in {
+  animation: focusReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+/* --- PROJECTS GRID (Right) --- */
+.projects-grid {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* --- DETAIL TYPOGRAPHY --- */
+.detail-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+  margin-bottom: 1rem;
+}
+
+.detail-header h3 {
+  font-size: 3rem;
+  margin: 0;
+  line-height: 1;
+  color: var(--accent-gold);
+}
+
+.detail-header .subtitle {
+  font-family: "Inter", sans-serif;
+  color: var(--text-dim);
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+.project-detail p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text);
+  opacity: 0.8;
+}
+
+/* --- PROJECT CARDS --- */
+.project-card {
+  padding: 20px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.project-card:hover,
+.project-card.active {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent-gold);
+  transform: translateX(5px);
+}
+
+.project-card h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.project-card p {
+  font-size: 0.85rem;
+  margin: 0;
+  color: var(--text-dim);
+}
+
+/* --- TAGS & BADGES --- */
+.tags-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.tag-pill {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.tag-pill.license {
+  color: #4caf50;
+  border-color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.tag-pill.type {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.tag-pill.platform {
+  color: #2196f3;
+  border-color: #2196f3;
+  background: rgba(33, 150, 243, 0.1);
+}
+
+/* --- STATUS COLORS --- */
+.subtitle.wip {
+  color: var(--accent-gold);
+  font-weight: bold;
+}
+
+.subtitle.stable {
+  color: #4caf50;
+}
+
+/* --- ACTION BUTTONS --- */
+.detail-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-action {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid var(--text-dim);
+  color: var(--text);
+  border-radius: 6px;
+  font-family: var(--font-header);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.btn-action:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.btn-action.primary {
+  background: var(--accent-gold);
+  color: #000;
+  border-color: var(--accent-gold);
+}
+
+.btn-action.primary:hover {
+  opacity: 0.8;
+}
+
+/* Locked Button State */
+.btn-action.disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  border-color: #444;
+  color: #888;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.btn-action.disabled:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #444;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .projects-container {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+  .projects-grid {
+    height: auto;
+    overflow: visible;
+  }
+}
