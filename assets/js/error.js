@@ -1,69 +1,67 @@
-(async function initErrorPage() {
-  // Select all elements that have data-text attributes
-  const elements = [
-    document.querySelector(".error-top-box"),
-    document.querySelector(".error-message"),
-    document.querySelector(".error-details"),
-    document.querySelector(".prompt-text"),
+(async function () {
+  // Elements
+  const lines = [
+    { el: document.querySelector(".error-top-box"), attr: "data-text" },
+    { el: document.querySelector(".error-message"), attr: "data-text" },
+    { el: document.querySelector(".error-details"), attr: "data-text" },
+    { el: document.querySelector(".prompt-text"), attr: "data-text" },
   ];
 
-  // Safety Check: If HTML isn't loaded yet, stop
-  if (!elements[0]) return;
-
-  // Prepare Cursor
+  // Cursor Setup
   const cursor = document.createElement("span");
   cursor.textContent = "_";
-  cursor.style.cssText =
-    "display:inline-block; animation: blink 0.7s steps(1) infinite; color: inherit;";
+  cursor.style.display = "inline-block";
+  cursor.style.animation = "blink 0.5s step-end infinite alternate";
 
-  // Inject Keyframes if missing
-  if (!document.getElementById("bsod-cursor-style")) {
+  if (!document.getElementById("cursor-keyframe")) {
     const style = document.createElement("style");
-    style.id = "bsod-cursor-style";
-    style.textContent = `@keyframes blink { 0%,50%,100% { opacity: 1; } 25%,75% { opacity: 0; } }`;
+    style.id = "cursor-keyframe";
+    style.innerHTML = `@keyframes blink { 50% { opacity: 0; } }`;
     document.head.appendChild(style);
   }
 
-  // Clear initial content and start typing loop
-  for (let el of elements) {
-    if (!el) continue;
+  // Animation Loop
+  for (const line of lines) {
+    if (!line.el) continue;
 
-    // Get text from the HTML attribute
-    const textToType = el.getAttribute("data-text") || "";
-    el.textContent = ""; // Clear it
+    // Reset content immediately
+    line.el.textContent = "";
 
-    el.appendChild(cursor);
+    // Get text
+    const text = line.el.getAttribute(line.attr) || "";
 
-    // Type character by character
-    for (let char of textToType) {
-      if (!document.body.contains(el)) return; // Stop if user left page
-      el.insertBefore(document.createTextNode(char), cursor);
-      // Fast typing speed
-      await new Promise((r) => setTimeout(r, 20));
+    // Attach cursor
+    line.el.appendChild(cursor);
+
+    // Type characters
+    for (let i = 0; i < text.length; i++) {
+      // Safety check: User might have clicked away
+      if (!document.body.contains(line.el)) return;
+
+      line.el.insertBefore(document.createTextNode(text[i]), cursor);
+      await new Promise((r) => setTimeout(r, 25)); // Typing Speed
     }
 
-    // Remove cursor from this line (unless it's the last one)
-    if (el !== elements[elements.length - 1]) {
-      el.removeChild(cursor);
+    // Remove cursor from this line (except last one)
+    if (line !== lines[lines.length - 1]) {
+      if (line.el.contains(cursor)) line.el.removeChild(cursor);
     }
   }
 
-  // Return Home Logic
-  let inputActive = false;
-  // Wait 1 second before allowing exit
+  // Exit Handler
+  let canExit = false;
   setTimeout(() => {
-    inputActive = true;
+    canExit = true;
   }, 500);
 
-  const goHome = () => {
-    if (!inputActive) return;
+  function goHome() {
+    if (!canExit) return;
     window.removeEventListener("keydown", goHome);
     window.removeEventListener("click", goHome);
 
-    // Trigger Router
     window.history.pushState(null, null, "/");
     window.dispatchEvent(new Event("popstate"));
-  };
+  }
 
   window.addEventListener("keydown", goHome);
   window.addEventListener("click", goHome);
