@@ -17,18 +17,29 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    // Detect if mouse is over vertical scrollbar
+
+    // Detect if mouse is over vertical scrollbar (approx 20px buffer)
     if (mouseX > window.innerWidth - 20) {
       onScrollbar = true;
       cursor.style.opacity = "0"; // Hide custom cursor
-      document.body.style.cursor = "auto"; // Show system cursor
+      document.body.style.cursor = "auto"; // Revert to system cursor
     } else {
       onScrollbar = false;
       cursor.style.opacity = "1";
       document.body.style.cursor = "none";
     }
   });
-  // Reset Lock on Scroll
+  // Hide Cursor on Window Exit
+  document.addEventListener("mouseleave", () => {
+    cursor.style.opacity = "0";
+  });
+  document.addEventListener("mouseenter", () => {
+    // Only show if not immediately on scrollbar
+    if (mouseX <= window.innerWidth - 20) {
+      cursor.style.opacity = "1";
+    }
+  });
+  // Reset Magnetic Lock on Scroll
   document.addEventListener(
     "scroll",
     () => {
@@ -40,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     { capture: true, passive: true }
   );
-  // Handle Interactive Elements
+  // Handle Interactive Hover Targets
   document.addEventListener("mouseover", (e) => {
     if (onScrollbar) return;
 
@@ -55,10 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
       cursor.classList.remove("is-locked");
     }
   });
-  // Animation Loop
+  // Physics & Animation Loop
   function animateCursor() {
     if (isHovering && targetRect && !onScrollbar) {
-      // Magnetic Effect (Slower, damped)
+      // Magnetic Mode (Damped, slower follow)
       const padding = 10;
       const targetX = targetRect.left - padding;
       const targetY = targetRect.top - padding;
@@ -72,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       cursor.style.borderRadius = "8px";
     } else {
-      // Free Follow (Fast)
+      // Free Mode (Fast follow)
       const targetX = mouseX - 6;
       const targetY = mouseY - 6;
 
