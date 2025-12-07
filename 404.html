@@ -1,26 +1,38 @@
-<link rel="stylesheet" href="/assets/css/error.css" />
-
-<div class="bsod-container">
-  <div class="error-top-box" data-text="ERROR 404">ERROR 404</div>
-
-  <div class="error-content">
-    <p
-      class="error-message"
-      data-text="The page you are looking for does not exist."
-    >
-      The page you are looking for does not exist.
-    </p>
-    <p
-      class="error-details"
-      data-text="Check the URL or press any key to return."
-    >
-      Check the URL or press any key to return.
-    </p>
-  </div>
-
-  <div class="prompt">
-    <span class="prompt-text" data-text="Press any key to continue"
-      >Press any key to continue</span
-    >
-  </div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VindE | 404</title>
+    <!-- CSS Styles -->
+    <!-- Loaded directly here for standalone GitHub Pages support -->
+    <link rel="stylesheet" href="/assets/css/error.css" />
+    <link rel="stylesheet" href="/assets/css/cursor.css" />
+  </head>
+  <body>
+    <!-- Main Error Container -->
+    <!-- In SPA mode, only this container is extracted and injected -->
+    <div class="bsod-container">
+      <!-- Error Code -->
+      <div class="error-top-box" data-text="ERROR 404"></div>
+      <!-- Error Details -->
+      <div class="error-content">
+        <p
+          class="error-message"
+          data-text="The page you are looking for does not exist."
+        ></p>
+        <p
+          class="error-details"
+          data-text="Check the URL or press any key to return."
+        ></p>
+      </div>
+      <!-- Prompt -->
+      <div class="prompt">
+        <span class="prompt-text" data-text="Press any key to continue"></span>
+      </div>
+    </div>
+    <!-- Logic Script -->
+    <!-- Runs automatically on standalone load, or triggered via Router in SPA mode -->
+    <script src="/assets/js/error.js"></script>
+  </body>
+</html>
