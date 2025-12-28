@@ -7,11 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const routes = {
     "/": "/pages/home.html",
     "/projects": "/pages/projects.html",
+    "/projects/snapdns": "/pages/projects/snapdns.html",
   };
 
   const titles = {
     "/": "VindE | Home",
     "/projects": "VindE | Projects",
+    "/projects/snapdns": "VindE | SnapDNS",
   };
 
   // --- NAVIGATION STATE ---
