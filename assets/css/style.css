@@ -1,57 +1,49 @@
-/* --- IMPORTS --- */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=swap");
-
 /* --- VARIABLES --- */
 :root {
-  /* DARK THEME */
+  /* DARK THEME (Default) */
   --bg: #0a0a0c;
   --surface: #141416;
   --text: #eeeeee;
   --text-dim: #888888;
-
   --accent-gold: #ffc107;
   --accent-red: #ff3b5c;
-
-  --font-body: "Inter", sans-serif;
-  --font-header: "Oswald", sans-serif;
-
-  --transition: 0.3s ease;
+  --border-color: rgba(255, 255, 255, 0.05);
 }
 
 body.light-theme {
   /* LIGHT THEME */
-  --bg: #d4d4d8;
-  --surface: #e4e4e7;
-  --text: #18181b;
-  --text-dim: #52525b;
-
+  --bg: #ffffff;
+  --surface: #f2f2f2;
+  --text: #000000;
+  --text-dim: #555555;
   --accent-gold: #ffc107;
-  --accent-red: #be123c;
+  --accent-red: #ff3b5c;
+  --border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* --- SCROLLBAR --- */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: var(--bg);
 }
-
 ::-webkit-scrollbar-thumb {
   background: #333;
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-gold);
 }
 
-/* --- RESET & LAYOUT --- */
-
+/* --- GLOBAL RESET --- */
 * {
   box-sizing: border-box;
-  cursor: none !important;
+  cursor: none !important; /* Custom Cursor Enforced */
+}
+
+html {
+  scroll-behavior: smooth !important;
 }
 
 body,
@@ -61,8 +53,7 @@ html {
   height: 100%;
   background-color: var(--bg);
   color: var(--text);
-  font-family: var(--font-body);
-  transition: background-color var(--transition), color var(--transition);
+  font-family: "Inter", sans-serif;
   overflow-x: hidden;
 }
 
@@ -72,19 +63,43 @@ body {
   min-height: 100vh;
 }
 
+/* OPTIMIZED: Transitions only on properties that change frequently */
+header,
+footer,
+.feature-card,
+.project-card,
+.btn,
+.project-detail,
+.back-link,
+#theme-toggle {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* --- LAYOUT CONTAINERS --- */
+#header-placeholder {
+  z-index: 100; /* Ensures navigation is always on top */
+  position: relative;
+}
+
 #page-content {
   flex: 1;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 140px 24px 40px;
   display: flex;
   flex-direction: column;
 
-  /* Animation Base State */
+  /* Fade Animation State */
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
 }
 
 #page-content.loaded {
@@ -96,10 +111,11 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-header);
+  font-family: "Oswald", sans-serif;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
+  font-weight: 700;
 }
 
 h1 {
@@ -109,14 +125,13 @@ h1 {
   line-height: 1;
 }
 
-h2 {
-  font-size: 2.5rem;
-  color: var(--text);
+/* Theme specific overrides */
+body.light-theme h1 {
+  text-shadow: none;
 }
-
-h3 {
-  font-size: 1.5rem;
-  color: var(--accent-red);
+body.light-theme h2,
+body.light-theme h3 {
+  color: #000;
 }
 
 a {
@@ -128,18 +143,18 @@ a:hover {
   color: var(--accent-gold);
 }
 
-/* --- UI COMPONENTS --- */
+/* --- UI COMPONENTS: BUTTONS --- */
 .btn {
   display: inline-block;
   padding: 10px 24px;
   background: transparent;
   border: 2px solid var(--accent-gold);
   color: var(--accent-gold);
-  font-family: var(--font-header);
+  font-family: "Oswald", sans-serif;
   font-size: 1.2rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  transition: 0.2s;
+  cursor: none !important;
 }
 
 .btn:hover {
@@ -148,7 +163,7 @@ a:hover {
   box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
 }
 
-/* --- HOME / INTRO SECTION --- */
+/* --- HOME PAGE ANIMATIONS --- */
 .intro {
   height: 60vh;
   min-height: 400px;
@@ -156,32 +171,25 @@ a:hover {
   flex-direction: column;
   justify-content: center;
   padding-left: 10%;
-  margin-top: 80px;
 }
 
 .intro h1 {
   font-size: 8rem;
   margin: 0;
   line-height: 0.9;
-  color: var(--accent-gold);
-  text-transform: uppercase;
   letter-spacing: -3px;
-
-  /* Animation */
   opacity: 0;
   animation: heroEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.1s;
 }
 
 .sub-text {
-  font-family: var(--font-header);
+  font-family: "Oswald", sans-serif;
   font-size: 1.5rem;
   color: var(--text);
   margin-top: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: 500;
-
-  /* Animation */
   opacity: 0;
   animation: heroEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.3s;
 }
@@ -193,47 +201,28 @@ a:hover {
 }
 
 .desc {
-  font-family: var(--font-body);
+  font-family: "Inter", sans-serif;
   font-size: 1.1rem;
   color: var(--text-dim);
   margin-top: 1.5rem;
   line-height: 1.5;
   max-width: 500px;
-
-  /* Animation */
   opacity: 0;
   animation: heroEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.5s;
 }
 
 .hint {
   margin-top: 3rem;
-  font-family: var(--font-header);
+  font-family: "Oswald", sans-serif;
   font-size: 0.8rem;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 1px;
-  opacity: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-
-  /* Animation */
+  opacity: 0;
   animation: heroEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.7s;
-}
-
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-  .intro {
-    padding-left: 0;
-    align-items: center;
-    text-align: center;
-  }
-  .intro h1 {
-    font-size: 5rem;
-  }
-  .desc {
-    padding: 0 20px;
-  }
 }
 
 /* --- KEYFRAMES --- */
@@ -250,6 +239,17 @@ a:hover {
   }
 }
 
-.hint {
-  animation-fill-mode: forwards;
+/* --- RESPONSIVE UTILITIES --- */
+@media (max-width: 768px) {
+  .intro {
+    padding-left: 0;
+    align-items: center;
+    text-align: center;
+  }
+  .intro h1 {
+    font-size: 5rem;
+  }
+  .desc {
+    padding: 0 20px;
+  }
 }

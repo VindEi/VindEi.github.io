@@ -1,51 +1,60 @@
-/* --- GLOBAL CURSOR RESET --- */
-html,
-body,
-a,
-button,
-input {
-  cursor: none !important;
-}
+/* 
+   --- CURSOR UTILITY --- 
+   Only active on devices with a mouse (pointer: fine).
+   Touch devices will ignore this entirely.
+*/
 
-/* --- CUSTOM CURSOR ELEMENT --- */
-#sticky-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
+@media (pointer: fine) {
+  /* Hide Default Cursor ONLY when custom cursor is ready */
+  body.custom-cursor-active,
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active input {
+    cursor: none !important;
+  }
 
-  /* Default State */
-  background-color: #fff;
-  mix-blend-mode: normal;
-  transition: opacity 0.2s, background-color 0.2s, border-color 0.2s;
-}
+  /* --- CUSTOM CURSOR ELEMENT --- */
+  #sticky-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    pointer-events: none; /* Allows clicking through it */
+    z-index: 99999;
 
-/* --- LOCKED STATE --- /
-/ Triggered when hovering interactive elements */
-#sticky-cursor.is-locked {
-  background-color: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-}
+    /* Hardware Acceleration Hints */
+    will-change: transform, width, height, border-radius;
+    transform: translate3d(0, 0, 0);
 
-/* --- THEME ADJUSTMENTS --- */
+    /* Default Appearance */
+    background-color: #fff;
+    mix-blend-mode: exclusion; /* Cool effect over white backgrounds */
+    transition:
+      opacity 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
 
-/* Light Theme */
-body.light-theme #sticky-cursor {
-  background-color: #000;
-}
+  /* --- LOCKED STATE (Hovering Links) --- */
+  #sticky-cursor.is-locked {
+    background-color: transparent !important;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    mix-blend-mode: normal;
+  }
 
-body.light-theme #sticky-cursor.is-locked {
-  background-color: transparent !important;
-  border: 1px solid rgba(0, 0, 0, 0.5);
-  box-shadow: none;
-}
+  /* --- THEME SPECIFIC OVERRIDES --- */
 
-/* Dark Theme Glow */
-body:not(.light-theme) #sticky-cursor {
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  /* Light Theme Adjustments */
+  body.light-theme #sticky-cursor {
+    background-color: #000;
+    mix-blend-mode: normal;
+  }
+
+  body.light-theme #sticky-cursor.is-locked {
+    border-color: #000;
+    box-shadow: none;
+  }
 }

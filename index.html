@@ -1,18 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VindE | Home</title>
+
+    <!--  Meta Description & Keywords -->
     <meta
       name="description"
-      content="VindE/VindEi personal website - Creating Windows software and random games."
+      content="VindE - Personal portfolio featuring Windows software, SnapDNS, C# projects, and Godot games."
     />
-    <meta name="keywords" content="VindE, VindEi, Software, SnapDNS, C#, Godot, Open Source" />
-    <meta name="author" content="VindE/VindEi" />
+    <meta
+      name="keywords"
+      content="VindE, VindEi, Software, SnapDNS, C#, Godot, Open Source, Portfolio"
+    />
+    <meta name="author" content="VindE" />
 
-    <!-- Embeds (Discord/Twitter) -->
-    <meta property="og:title" content="VindE" />
+    <!--  Open Graph (Social Media) -->
+    <meta property="og:title" content="VindE | Software & Games" />
     <meta
       property="og:description"
       content="Creating Windows software and random games."
@@ -24,6 +29,14 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/assets/img/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/assets/css/style.css" />
     <link rel="stylesheet" href="/assets/css/header.css" />
@@ -32,21 +45,36 @@
     <link rel="stylesheet" href="/assets/css/projects.css" />
     <link
       rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     />
   </head>
-  <body class="dark-theme">
+  <body>
     <!-- Header Container -->
     <div id="header-placeholder"></div>
+
     <!-- Dynamic Content Area -->
     <main id="page-content"></main>
+
     <!-- Footer Container -->
     <div id="footer-placeholder"></div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      defer
+    ></script>
+
     <!-- Core Scripts -->
     <script src="/assets/js/script.js" defer></script>
     <script src="/assets/js/router.js" defer></script>
+
+    <!-- Feature Scripts -->
     <script src="/assets/js/cursor.js" defer></script>
     <script src="/assets/js/projects.js" defer></script>
     <script src="/assets/js/error.js" defer></script>
+    <script src="/assets/js/echo.js" defer></script>
   </body>
 </html>

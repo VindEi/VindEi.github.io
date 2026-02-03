@@ -1,6 +1,5 @@
 <section class="product-page">
   <!-- BACK BUTTON -->
-  <!-- No bottom margin here, handled by gap below -->
   <div class="back-nav-container">
     <a href="/projects" class="back-link">
       <i class="fas fa-arrow-left"></i> Back to Projects
@@ -10,6 +9,7 @@
   <!-- HERO SECTION -->
   <div class="product-hero">
     <div class="product-info">
+      <!-- TAGS -->
       <div class="badge-row">
         <span class="tag-pill license">Open Source</span>
         <span class="tag-pill type">Software</span>
@@ -21,6 +21,7 @@
           src="https://raw.githubusercontent.com/VindEi/SnapDNS/master/assets/SnapDns.png"
           alt="SnapDNS Logo"
           class="product-logo"
+          loading="lazy"
         />
         <h1>SnapDNS</h1>
       </div>
@@ -32,15 +33,19 @@
       </p>
 
       <div class="hero-actions">
+        <!-- 1. INSTALLER -->
         <a
           href="https://github.com/VindEi/SnapDNS/releases/download/v1.0.0/SnapDns_Setup.exe"
           class="btn-action primary"
         >
           Windows Installer <i class="fab fa-windows"></i>
         </a>
+
+        <!-- 2. GITHUB SOURCE -->
         <a
           href="https://github.com/VindEi/SnapDNS"
           target="_blank"
+          rel="noopener noreferrer"
           class="btn-action"
         >
           View Source <i class="fab fa-github"></i>
@@ -53,6 +58,7 @@
         <a
           href="https://github.com/VindEi/SnapDNS/releases/tag/v1.0.0"
           target="_blank"
+          rel="noopener noreferrer"
           style="color: var(--accent-gold); text-decoration: underline"
         >
           Looking for Linux or macOS versions?
@@ -60,23 +66,40 @@
       </p>
     </div>
 
-    <div class="product-visual">
+    <!-- HERO VISUALS -->
+    <!-- OPTIMIZED: Added tabindex for accessibility on mobile tap interactions -->
+    <div
+      class="product-visual"
+      tabindex="0"
+      aria-label="Tap to switch between light and dark mode preview"
+    >
+      <!-- Dark Mode Image -->
       <div class="shot-wrapper front-shot">
         <img
           src="https://raw.githubusercontent.com/VindEi/SnapDNS/master/assets/SnapDns_Dark.png"
           class="app-screenshot"
-          alt="SnapDNS Dark"
+          alt="SnapDNS Dark Mode Interface"
+          loading="lazy"
         />
         <div class="screen-shine"></div>
       </div>
+
+      <!-- Light Mode Image -->
       <div class="shot-wrapper back-shot">
         <img
           src="https://raw.githubusercontent.com/VindEi/SnapDNS/master/assets/SnapDns_Light.png"
           class="app-screenshot"
-          alt="SnapDNS Light"
+          alt="SnapDNS Light Mode Interface"
+          loading="lazy"
         />
         <div class="screen-shine"></div>
       </div>
+
+      <!-- MOBILE TAP INDICATOR -->
+      <div class="mobile-hint">
+        <i class="fas fa-sync-alt"></i> Tap image to switch theme
+      </div>
+
       <div class="glow-effect"></div>
     </div>
   </div>
@@ -88,8 +111,7 @@
       <h3>Architecture</h3>
       <p>
         <strong>Split-Process Design:</strong> UI runs as User, Background
-        Service runs as System. Uses Named Pipes for secure communication and a
-        local UDP proxy for DoH.
+        Service runs as System. Uses Named Pipes for secure communication.
       </p>
     </div>
 

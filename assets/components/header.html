@@ -1,22 +1,22 @@
 <header>
-  <div
-    class="header-left"
-    unselectable="on"
-    onmousedown="return false;"
-    onselectstart="return false;"
-  >
+  <!-- Logo Section -->
+  <div class="header-left no-select">
     <img src="/assets/img/logo.png" alt="VindE Logo" class="logo" />
     <h1>VindE</h1>
   </div>
+
+  <!-- Navigation -->
   <nav class="header-nav">
-    <a href="/" data-page="home" class="hover-target"
-      ><i class="fas fa-home"></i> Home</a
-    >
-    <a href="/projects" data-page="projects" class="hover-target"
-      ><i class="fas fa-box-open"></i> Projects</a
-    >
+    <a href="/" data-page="home" class="hover-target">
+      <i class="fas fa-home"></i> <span>Home</span>
+    </a>
+    <a href="/projects" data-page="projects" class="hover-target">
+      <i class="fas fa-box-open"></i> <span>Projects</span>
+    </a>
   </nav>
-  <button id="theme-toggle" aria-label="Toggle theme">
+
+  <!-- Theme Toggle -->
+  <button id="theme-toggle" type="button" aria-label="Toggle theme">
     <i class="fas fa-moon fa-fw"></i>
   </button>
 </header>

@@ -6,54 +6,59 @@ header {
   transform: translateX(-50%);
 
   /* Dimensions */
-  min-width: 750px;
-  max-width: 95%;
+  width: 95%;
+  max-width: 900px;
   padding: 10px 25px;
 
   /* Layout */
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0;
+  justify-content: space-between;
 
-  /* Glassmorphism Styles */
+  /* Glassmorphism */
   border-radius: 50px;
   background: rgba(20, 20, 22, 0.7);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+
   z-index: 1000;
   transition: all 0.3s ease;
 }
 
 body.light-theme header {
-  background: rgba(255, 255, 255, 0.75);
-  border-color: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* --- LEFT SECTION (Logo & Title) --- */
+/* --- LEFT SECTION (Logo) --- */
 .header-left {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-right: auto;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .header-left img.logo {
   height: 32px;
   width: auto;
   display: block;
-
-  /* Visual Zoom */
   transform: scale(1.5);
-  transform-origin: center;
   margin-right: 8px;
   margin-left: 5px;
-
-  /* Contrast Drop Shadow */
   filter: drop-shadow(0px 0px 1px rgba(255, 255, 255, 0.8));
+}
+
+body.light-theme .header-left img.logo {
+  filter: none;
 }
 
 .header-left h1 {
@@ -68,9 +73,8 @@ body.light-theme header {
 /* --- NAVIGATION --- */
 .header-nav {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: center;
-  margin-right: 3rem;
 }
 
 .header-nav a {
@@ -81,26 +85,53 @@ body.light-theme header {
   color: var(--text);
   opacity: 0.6;
   position: relative;
+
+  /* Layout for Icon + Text */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between icon and text */
+
   transition: all 0.3s;
+
+  /* Cursor & Click Area */
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+/* Icon Styling (Desktop) */
+.header-nav a i {
+  font-size: 1rem;
+  margin-bottom: 2px; /* Visual alignment fix */
+}
+
+body.light-theme .header-nav a {
+  color: #000;
+  opacity: 0.7;
 }
 
 .header-nav a:hover {
   opacity: 1;
   color: var(--text);
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.05);
 }
 
+body.light-theme .header-nav a:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Active State */
 .header-nav a.active {
   opacity: 1;
-  color: var(--accent-gold);
+  color: var(--accent-gold) !important;
 }
 
 .header-nav a.active::after {
   content: "";
   position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
+  bottom: 4px;
+  left: 12px;
+  right: 12px;
   height: 2px;
   background: var(--accent-gold);
   box-shadow: 0 0 8px var(--accent-gold);
@@ -114,69 +145,76 @@ body.light-theme header {
   font-size: 1.1rem;
   cursor: pointer;
   opacity: 0.8;
-
-  /* Fixed dimensions to prevent layout shift */
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  margin-left: 0;
+  transition:
+    color 0.3s,
+    transform 0.2s;
+  border-radius: 50%;
 }
 
 #theme-toggle:hover {
   opacity: 1;
   color: var(--accent-gold);
+  transform: rotate(15deg);
 }
 
-/* --- MOBILE RESPONSIVENESS --- */
+/* --- RESPONSIVE (MOBILE) --- */
 @media (max-width: 768px) {
   header {
-    min-width: 0;
     width: 92%;
     top: 15px;
-    padding: 8px 20px;
-    gap: 0;
+    padding: 8px 15px;
   }
 
-  /* Compact Logo Area */
   .header-left {
     gap: 8px;
   }
 
   .header-left img.logo {
     height: 28px;
+    transform: scale(1.2);
   }
 
   .header-left h1 {
     display: none;
   }
 
-  /* Icon-Only Navigation */
+  /* Centered Nav on Mobile */
   .header-nav {
-    gap: 1.5rem;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    gap: 1.5rem;
+    margin: 0;
   }
 
-  .header-nav a {
-    font-size: 0;
+  /* Hide Text on Mobile */
+  .header-nav a span {
+    display: none;
   }
 
+  /* Ensure Icon is visible and larger on Mobile */
   .header-nav a i {
-    font-size: 1.2rem;
     display: block;
-    line-height: 1;
+    font-size: 1.3rem;
+    margin-bottom: 0;
+  }
+
+  /* Circle buttons on mobile */
+  .header-nav a {
+    padding: 8px;
+    border-radius: 50%;
+    gap: 0;
   }
 
   .header-nav a.active::after {
-    bottom: -8px;
-  }
-
-  #theme-toggle {
-    font-size: 1.1rem;
-    padding: 5px;
+    bottom: 2px;
+    left: 20%;
+    right: 20%;
   }
 }

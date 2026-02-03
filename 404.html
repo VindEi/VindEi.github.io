@@ -1,38 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VindE | 404</title>
-    <!-- CSS Styles -->
-    <!-- Loaded directly here for standalone GitHub Pages support -->
+    <!-- Standalone Styles (SPA loads these via head injection, but good for backup) -->
     <link rel="stylesheet" href="/assets/css/error.css" />
     <link rel="stylesheet" href="/assets/css/cursor.css" />
   </head>
   <body>
-    <!-- Main Error Container -->
-    <!-- In SPA mode, only this container is extracted and injected -->
+    <!-- 
+      BSOD Container 
+      Router.js extracts this div's content.
+    -->
     <div class="bsod-container">
-      <!-- Error Code -->
-      <div class="error-top-box" data-text="ERROR 404"></div>
-      <!-- Error Details -->
-      <div class="error-content">
-        <p
-          class="error-message"
-          data-text="The page you are looking for does not exist."
-        ></p>
-        <p
-          class="error-details"
-          data-text="Check the URL or press any key to return."
-        ></p>
-      </div>
-      <!-- Prompt -->
-      <div class="prompt">
-        <span class="prompt-text" data-text="Press any key to continue"></span>
+      <div class="crt-overlay"></div>
+
+      <div class="terminal-wrapper">
+        <!-- Error Code -->
+        <div
+          class="error-line error-top-box"
+          data-text="ERROR 404 // SYSTEM_HALTED"
+        ></div>
+
+        <!-- Error Details -->
+        <div class="error-content">
+          <p
+            class="error-line"
+            data-text="> FATAL EXCEPTION: PAGE_NOT_FOUND"
+          ></p>
+          <p
+            class="error-line"
+            data-text="> The requested address is invalid or corrupted."
+          ></p>
+          <p class="error-line" data-text="> Check the URL integrity."></p>
+        </div>
+
+        <!-- Prompt -->
+        <div class="prompt-container">
+          <span
+            class="error-line prompt-text"
+            data-text="Press any key to reboot system..."
+          ></span>
+          <span class="blinking-cursor">_</span>
+        </div>
       </div>
     </div>
-    <!-- Logic Script -->
-    <!-- Runs automatically on standalone load, or triggered via Router in SPA mode -->
+
+    <!-- Logic Script (Runs only if class .bsod-container exists) -->
     <script src="/assets/js/error.js"></script>
   </body>
 </html>

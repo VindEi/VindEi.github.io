@@ -1,13 +1,17 @@
 <section id="projects">
   <div class="projects-container">
-    <!-- Project Details Panel -->
+    <!-- Project Details Panel (Populated by JS) -->
     <div id="project-detail" class="project-detail"></div>
 
     <!-- Projects List -->
-    <div class="projects-grid">
-      <!-- 1. Portfolio -->
+    <!-- Added role="list" for semantics -->
+    <div class="projects-grid" role="list">
+      <!-- 1. VindE.me -->
       <div
         class="project-card"
+        tabindex="0"
+        role="button"
+        aria-label="View details for VindE.me website"
         data-title="VindE.me"
         data-desc="The source code for the site you're looking at right now. No frameworks, just vibes."
         data-github="https://github.com/VindEi/VindEi.github.io"
@@ -33,6 +37,9 @@
       <!-- 2. SnapDNS -->
       <div
         class="project-card"
+        tabindex="0"
+        role="button"
+        aria-label="View details for SnapDNS"
         data-title="SnapDNS"
         data-desc="A cross-platform DNS changer with DNS-over-HTTPS (DoH) support. Built with .NET 8 and Avalonia UI."
         data-github="https://github.com/VindEi/SnapDns"
@@ -43,8 +50,6 @@
         data-product-page="/projects/snapdns"
         data-icon='<i class="fas fa-bolt"></i>'
       >
-        <!-- NOTE: I used a FontAwesome bolt icon here for consistency, 
-             but if you want the image, replace the <i> with <img src="..." width="24"> -->
         <div>
           <h3>
             <i
@@ -60,6 +65,9 @@
       <!-- 3. Dodge -->
       <div
         class="project-card"
+        tabindex="0"
+        role="button"
+        aria-label="View details for Project Dodge"
         data-title="Project: Dodge"
         data-desc="Secret hehe ^-^"
         data-github="#"
@@ -79,6 +87,9 @@
       <!-- 4. AuthMe -->
       <div
         class="project-card"
+        tabindex="0"
+        role="button"
+        aria-label="View details for AuthMe"
         data-title="AuthMe"
         data-desc="Cross-platform 2FA Authenticator. Local encryption and cloud backups."
         data-github="https://github.com/VindEi/AuthMe"
@@ -98,6 +109,9 @@
       <!-- 5. AutoClickIt -->
       <div
         class="project-card"
+        tabindex="0"
+        role="button"
+        aria-label="View details for AutoClickIt"
         data-title="AutoClickIt"
         data-desc="A simple, fast, and unlimited auto-clicker. Works in the background without getting in your way."
         data-github="https://github.com/VindEi/AutoClickIt"
@@ -123,6 +137,9 @@
       <!-- 6. Cmd-HandyScripts -->
       <div
         class="project-card"
+        tabindex="0"
+        role="button"
+        aria-label="View details for Cmd-HandyScripts"
         data-title="Cmd-HandyScripts"
         data-desc="Essential automation scripts for Windows. Debloaters, network repairs, and maintenance."
         data-github="https://github.com/VindEi/Cmd-HandyScripts"

@@ -2,5 +2,8 @@
 deployment:
   tasks:
     - export DEPLOYPATH=$HOME/public_html/
+    # Copy all files and folders recursively
     - /bin/cp -R * $DEPLOYPATH
+    # Explicitly ensure hidden config files are copied
     - /bin/cp .htaccess $DEPLOYPATH
+    - /bin/cp robots.txt $DEPLOYPATH

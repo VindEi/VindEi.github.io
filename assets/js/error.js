@@ -1,99 +1,88 @@
 (function () {
-  const init = async () => {
-    // 1. Validation
+  let isAnimating = false;
+
+  const initErrorPage = async () => {
     const container = document.querySelector(".bsod-container");
-    if (!container) return; // Exit if not on error page
-    // Prevent duplicate execution
-    if (container.dataset.animating === "true") return;
-    container.dataset.animating = "true";
+    if (!container) return; // Not on error page
+    if (isAnimating) return; // Prevent double firing
+    isAnimating = true;
 
-    // 2. Select Elements
-    const lines = [
-      { el: document.querySelector(".error-top-box"), attr: "data-text" },
-      { el: document.querySelector(".error-message"), attr: "data-text" },
-      { el: document.querySelector(".error-details"), attr: "data-text" },
-      { el: document.querySelector(".prompt-text"), attr: "data-text" },
-    ];
+    // Elements
+    const lines = Array.from(document.querySelectorAll(".error-line"));
+    const cursor = document.querySelector(".blinking-cursor");
 
-    // 3. Initialize Cursor
-    let cursor = document.getElementById("typing-cursor");
-    if (!cursor) {
-      cursor = document.createElement("span");
-      cursor.id = "typing-cursor";
-      cursor.textContent = "_";
-      cursor.style.cssText =
-        "display:inline-block; font-weight:bold; animation: blink 0.5s step-end infinite alternate;";
-    }
+    // Reset state (clear text for typing effect)
+    lines.forEach((line) => {
+      line._fullText = line.getAttribute("data-text");
+      line.textContent = "";
+      line.style.opacity = "1"; // Make visible but empty
+    });
 
-    // Inject Keyframes if missing
-    if (!document.getElementById("cursor-anim-style")) {
-      const style = document.createElement("style");
-      style.id = "cursor-anim-style";
-      style.innerHTML = `@keyframes blink { 50% { opacity: 0; } }`;
-      document.head.appendChild(style);
-    }
+    if (cursor) cursor.style.opacity = "1";
 
-    // 4. Animation Logic
-    const runAnimation = async () => {
-      // Clear initial text
-      lines.forEach((line) => {
-        if (line.el) line.el.textContent = "";
-      });
+    // --- TYPING LOGIC ---
+    const typeLine = async (element) => {
+      const text = element._fullText;
+      if (!text) return;
 
-      // Typing Loop
-      for (const line of lines) {
-        if (!line.el) continue;
+      // Move cursor to this line
+      element.appendChild(cursor);
 
-        const text = line.el.getAttribute(line.attr) || "";
-        line.el.appendChild(cursor);
+      for (let i = 0; i < text.length; i++) {
+        // Stop if user navigated away
+        if (!document.body.contains(element)) return;
 
-        for (let i = 0; i < text.length; i++) {
-          if (!document.body.contains(line.el)) return; // Safety check
-          line.el.insertBefore(document.createTextNode(text[i]), cursor);
-          await new Promise((r) => setTimeout(r, 20)); // Typing speed
-        }
+        element.insertBefore(document.createTextNode(text[i]), cursor);
 
-        // Cleanup cursor from line (unless last)
-        if (line !== lines[lines.length - 1]) {
-          if (line.el.contains(cursor)) line.el.removeChild(cursor);
-        }
+        // Random typing variance for realism
+        const delay = Math.random() * 30 + 10;
+        await new Promise((r) => setTimeout(r, delay));
       }
-
-      setupExit();
     };
 
-    // 5. Exit Logic
-    const setupExit = () => {
-      // Delay interaction to prevent accidental clicks
-      setTimeout(() => {
-        const goHome = () => {
-          window.removeEventListener("keydown", goHome);
-          window.removeEventListener("click", goHome);
+    // Process lines sequentially
+    for (const line of lines) {
+      await typeLine(line);
+    }
 
-          // SPA Navigation if available, otherwise Force Reload
-          if (window.history && window.history.pushState) {
+    // Enable Exit Interaction
+    setTimeout(() => {
+      const goHome = (e) => {
+        // Prevent trigger on text selection
+        if (window.getSelection().toString().length > 0) return;
+
+        window.removeEventListener("keydown", goHome);
+        window.removeEventListener("click", goHome);
+
+        // Visual Feedback
+        document.body.style.transition = "filter 0.5s ease, opacity 0.5s ease";
+        document.body.style.filter = "brightness(5) blur(10px)";
+        document.body.style.opacity = "0";
+
+        // Navigation
+        setTimeout(() => {
+          if (window.routerLoadPage) {
+            // If router is available (SPA)
             window.history.pushState(null, null, "/");
-            window.dispatchEvent(new Event("popstate"));
-
-            // Fallback reload if Router is missing (Standalone mode)
-            if (!document.getElementById("page-content"))
-              window.location.href = "/";
+            window.routerLoadPage("/");
+            // Reset styles after nav
+            setTimeout(() => {
+              document.body.style = "";
+              isAnimating = false;
+            }, 500);
           } else {
+            // Standalone Fallback
             window.location.href = "/";
           }
-        };
+        }, 500);
+      };
 
-        window.addEventListener("keydown", goHome);
-        window.addEventListener("click", goHome);
-      }, 500);
-    };
-
-    // Execute
-    runAnimation();
+      window.addEventListener("keydown", goHome);
+      window.addEventListener("click", goHome);
+    }, 500);
   };
-  // --- EVENT LISTENERS ---
-  // Listen for SPA Router Events
-  document.addEventListener("spa-content-loaded", init);
-  // Listen for Direct Page Load (GitHub Pages Standalone)
-  document.addEventListener("DOMContentLoaded", init);
+
+  // Attach Listeners
+  document.addEventListener("spa-content-loaded", initErrorPage);
+  document.addEventListener("DOMContentLoaded", initErrorPage);
 })();
