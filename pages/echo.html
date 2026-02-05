@@ -1,7 +1,6 @@
 <!-- SCOPED STYLES for Echo Page -->
 <style>
   .echo-container {
-    /* FIX: Reset fixed height from .intro class so footer gets pushed down */
     height: auto !important;
     min-height: 100vh;
     padding-top: 40px;
@@ -38,7 +37,6 @@
     letter-spacing: 1px;
   }
 
-  /* Refresh Button */
   .btn-refresh {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -58,7 +56,6 @@
     border-color: var(--accent-gold);
   }
 
-  /* IP Big Text */
   .ip-display-row {
     display: flex;
     align-items: center;
@@ -89,7 +86,6 @@
     margin-bottom: 2.5rem;
   }
 
-  /* Copy Button */
   .copy-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -97,7 +93,7 @@
     padding: 12px 18px;
     border-radius: 8px;
     cursor: pointer;
-    display: none; /* Hidden until loaded */
+    display: none;
     transition: 0.2s;
   }
   .copy-btn:hover {
@@ -114,7 +110,6 @@
     white-space: nowrap;
   }
 
-  /* Grid Layout */
   .echo-main-grid {
     display: grid;
     grid-template-columns: 1.8fr 1.2fr;
@@ -131,7 +126,6 @@
     font-weight: bold;
   }
 
-  /* Map */
   #map {
     width: 100%;
     height: 400px;
@@ -142,15 +136,78 @@
     z-index: 1;
   }
 
-  .api-source {
-    font-size: 0.7rem;
-    color: var(--text-dim);
+  /* --- NETWORK LOG STYLES --- */
+  .network-log-container {
     margin-top: 10px;
     text-align: right;
-    font-family: "Oswald", sans-serif;
   }
 
-  /* Knowledge Base */
+  details#net-log {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    text-align: right;
+  }
+
+  summary#api-source-summary {
+    list-style: none;
+    font-family: "Oswald", sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    transition: color 0.2s;
+  }
+  summary#api-source-summary:hover {
+    color: var(--accent-gold);
+  }
+  /* Remove default triangle */
+  summary#api-source-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .log-list {
+    margin-top: 10px;
+    background: rgba(20, 20, 22, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: left;
+    min-width: 250px;
+    position: absolute;
+    right: 0;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+  }
+
+  .log-item {
+    display: flex;
+    justify-content: space-between;
+    font-family: "Inter", sans-serif;
+    font-size: 0.75rem;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .log-item:last-child {
+    border-bottom: none;
+  }
+
+  .log-name {
+    color: var(--text);
+  }
+
+  .log-status {
+    font-weight: bold;
+  }
+  .log-status.winner {
+    color: #4caf50;
+  } /* Green */
+  .log-status.fail {
+    color: var(--accent-red);
+  } /* Red */
+  .log-status.slow {
+    color: #ff9800;
+  } /* Orange */
+
   .kb-section {
     margin-top: 5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -163,7 +220,6 @@
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 3rem;
   }
-
   .kb-item h4 {
     margin-bottom: 10px;
     color: var(--text);
@@ -174,7 +230,6 @@
     line-height: 1.6;
   }
 
-  /* Mobile */
   @media (max-width: 900px) {
     .echo-main-grid {
       grid-template-columns: 1fr;
@@ -182,19 +237,24 @@
     #map {
       height: 300px;
     }
+    .network-log-container {
+      text-align: center;
+    }
+    .log-list {
+      right: 50%;
+      transform: translateX(50%);
+    }
   }
 </style>
 
 <section class="intro echo-container">
-  <!-- Use standard wrapper (max-width handled by style.css, but overridden here for wider view) -->
   <div style="max-width: 1150px; margin: 0 auto; width: 100%">
-    <!-- UTILITY HEADER -->
+    <!-- HEADER -->
     <div class="echo-header-row">
       <div class="echo-title-group">
         <p class="accent-tag">SYSTEM ECHO</p>
         <span id="echo-latency" class="latency-tag"></span>
       </div>
-
       <button
         id="refresh-echo"
         class="btn-refresh"
@@ -204,14 +264,11 @@
       </button>
     </div>
 
-    <!-- IP & IDENTITY SECTION -->
+    <!-- IP DISPLAY -->
     <div>
       <div class="ip-display-row">
         <h1 id="user-ip"><span style="opacity: 0.2">INITIALIZING...</span></h1>
-
         <img id="user-flag" src="" alt="Country Flag" />
-
-        <!-- Action Row -->
         <div style="display: flex; align-items: center; gap: 12px">
           <button
             id="copy-ip-btn"
@@ -223,13 +280,14 @@
           <div id="copy-toast" class="toast-msg">[ IP_COPIED ]</div>
         </div>
       </div>
-      <p id="user-isp">Establishing parallel uplink...</p>
+      <p id="user-isp">Establishing secure race...</p>
     </div>
 
-    <!-- MAIN DATA GRID -->
+    <!-- GRID -->
     <div class="echo-main-grid">
+      <!-- INFO COLUMNS -->
       <div style="display: flex; flex-direction: column; gap: 2.5rem">
-        <!-- NETWORK SECTION -->
+        <!-- NETWORK -->
         <div>
           <h2 class="section-title">[ NETWORK ]</h2>
           <div
@@ -263,7 +321,7 @@
           </div>
         </div>
 
-        <!-- HARDWARE SECTION -->
+        <!-- HARDWARE -->
         <div>
           <h2 class="section-title">[ HARDWARE ]</h2>
           <div
@@ -281,7 +339,6 @@
                 <a
                   href="#kb"
                   style="color: var(--accent-gold); text-decoration: none"
-                  aria-label="Read disclaimer"
                   >(?)</a
                 >
               </h3>
@@ -315,7 +372,7 @@
           </div>
         </div>
 
-        <!-- BROWSER SECTION -->
+        <!-- BROWSER -->
         <div>
           <h2 class="section-title">[ BROWSER ]</h2>
           <div
@@ -358,7 +415,6 @@
                 <a
                   href="#kb"
                   style="color: var(--accent-gold); text-decoration: none"
-                  aria-label="Read disclaimer"
                   >(?)</a
                 >
               </h3>
@@ -367,7 +423,6 @@
           </div>
         </div>
 
-        <!-- UA Dropdown -->
         <details
           style="
             cursor: pointer;
@@ -404,7 +459,14 @@
       <div style="display: flex; flex-direction: column">
         <h2 class="section-title">[ GEOLOCATION ]</h2>
         <div id="map"></div>
-        <p id="api-source" class="api-source">PROBING...</p>
+
+        <!-- NEW LOG DROPDOWN -->
+        <div class="network-log-container">
+          <details id="net-log">
+            <summary id="api-source-summary">PROBING...</summary>
+            <div id="api-log-list" class="log-list"></div>
+          </details>
+        </div>
 
         <div
           class="feature-card"
@@ -430,7 +492,7 @@
       </div>
     </div>
 
-    <!-- KNOWLEDGE BASE -->
+    <!-- KB -->
     <div id="kb" class="kb-section">
       <h2
         style="
@@ -446,14 +508,13 @@
       >
         NOTICE: SOME DATA MAY BE MASKED BY BROWSER SHIELDS OR ISP ROUTING.
       </p>
-
       <div class="kb-grid">
         <div class="kb-item">
           <h4>Why is hardware data capped?</h4>
           <p>
             Modern browsers use "Anti-Fingerprinting" to protect your privacy.
             High-end hardware is often reported as standard values (e.g., 8GB
-            RAM) to prevent unique tracking.
+            RAM).
           </p>
         </div>
         <div class="kb-item">
