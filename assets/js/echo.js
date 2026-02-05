@@ -1,10 +1,14 @@
 /**
  * VindE - System Echo Module
  *
- * Responsible for gathering and displaying client-side telemetry:
- * 1. Browser Fingerprinting (Hardware, Software, Environment).
- * 2. Network Analysis (IP, ISP, Geolocation) using a multi-provider race strategy.
+ * Aggregates client-side telemetry including:
+ * 1. Browser Fingerprinting (Hardware, Software, Capabilities).
+ * 2. Network Intelligence (IP, ISP, Geolocation) via multi-provider race.
  * 3. Interactive Mapping via Leaflet.js.
+ *
+ * Strategy: "Shotgun" approach (Promise.any). Requests are sent to multiple
+ * IP providers simultaneously. The first valid response updates the UI.
+ * Slower or failed requests are logged but do not block the user experience.
  */
 
 (function () {
@@ -18,11 +22,11 @@
   // ==========================================================================
 
   /**
-   * Safely sets the text content of a DOM element.
-   * Prevents crashes if the element is missing or the callback fails.
+   * Safely sets text content for a DOM element.
+   * Ignores missing elements or empty values to prevent UI flickering.
    *
-   * @param {string} id - HTML ID of the target element.
-   * @param {Function} callback - Function returning the value to display.
+   * @param {string} id - The DOM element ID.
+   * @param {Function} callback - Function returning the value to set.
    */
   const safeSet = (id, callback) => {
     const el = document.getElementById(id);
@@ -30,22 +34,19 @@
 
     try {
       const val = callback();
-      const isValid = val && val !== "---" && val !== "Unknown";
-
-      // Update only if value is valid, or if currently showing a placeholder
-      if (isValid) {
+      // Only update if value is meaningful
+      if (val && val !== "---" && val !== "Unknown") {
         el.innerText = val;
       } else if (el.innerText === "---" || el.innerText === "PROBING...") {
         el.innerText = "---";
       }
     } catch (e) {
-      console.warn(`[Echo] Failed to set ${id}:`, e);
+      // Suppress errors for cleaner console logs during DOM updates
     }
   };
 
   /**
-   * Checks if a string is null, empty, or a generic placeholder.
-   * Used during the data merge process to identify gaps.
+   * Helper to determine if a data field is missing or generic.
    */
   const isMissing = (str) => {
     return (
@@ -54,8 +55,7 @@
   };
 
   /**
-   * Re-renders the map when the global theme changes to ensure
-   * the tiles match the new theme (Dark/Light).
+   * Re-renders the map tiles when the global theme changes.
    */
   const handleThemeChange = () => {
     if (echoMap && mapCoords) {
@@ -68,7 +68,7 @@
   // ==========================================================================
 
   const getBrowserData = async () => {
-    // --- Navigator Identity ---
+    // --- Identity ---
     safeSet("user-ua", () => navigator.userAgent);
     safeSet("user-os", () => navigator.platform);
     safeSet("user-lang", () =>
@@ -77,7 +77,7 @@
         : navigator.language,
     );
 
-    // --- Hardware Heuristics ---
+    // --- Hardware ---
     safeSet(
       "user-res",
       () =>
@@ -91,11 +91,6 @@
     safeSet("user-ram", () =>
       navigator.deviceMemory ? `${navigator.deviceMemory}GB+` : "8GB (Capped)",
     );
-    safeSet("user-latency", () =>
-      navigator.scheduling && navigator.scheduling.isInputPending
-        ? "Optimized"
-        : "Standard",
-    );
 
     // --- Environment ---
     safeSet("user-bot", () =>
@@ -107,13 +102,7 @@
         : "Light Mode",
     );
 
-    safeSet("user-win-state", () => {
-      const isSplit = window.innerWidth < window.screen.width - 60;
-      return isSplit ? `Windowed (${window.innerWidth}px)` : "Maximized";
-    });
-
-    // --- AdBlock Detection ---
-    // Attempts to fetch a known ad script. If blocked by network filter, assumes AdBlock is active.
+    // --- AdBlock Detection (Network Heuristic) ---
     const adBlockEl = document.getElementById("user-adblock");
     if (adBlockEl) {
       const adsUrl =
@@ -126,7 +115,7 @@
       }
     }
 
-    // --- WebGL Renderer (GPU) ---
+    // --- WebGL Renderer (GPU Extraction) ---
     const gpuEl = document.getElementById("user-gpu");
     if (gpuEl) {
       try {
@@ -149,7 +138,6 @@
   // ==========================================================================
 
   const getNetworkData = async () => {
-    // DOM Elements
     const ipEl = document.getElementById("user-ip");
     const ispEl = document.getElementById("user-isp");
     const logSummary = document.getElementById("api-source-summary");
@@ -159,7 +147,7 @@
 
     if (!ipEl) return;
 
-    // Reset UI State
+    // --- UI State Reset ---
     if (refreshIcon) refreshIcon.classList.add("fa-spin");
     ipEl.innerText = "CONNECTING...";
     ipEl.style.color = "var(--text)";
@@ -168,11 +156,68 @@
     if (logList) logList.innerHTML = "";
 
     const globalStart = performance.now();
-    const ts = Date.now(); // Cache busting timestamp
 
-    // --- Provider Configuration ---
-    // Sorted by reliability and data richness.
+    /**
+     * Data Providers Configuration
+     * URLs must be clean (no query params) to avoid 404s on strict APIs.
+     * Caching is handled via the 'no-store' fetch directive.
+     */
     const richProviders = [
+      {
+        name: "geojs.io",
+        url: `https://get.geojs.io/v1/ip/geo.json`,
+        parse: (j) => ({
+          ip: j.ip,
+          isp: j.organization_name || j.asn || "Unknown",
+          org: j.organization || "---",
+          asn: j.asn ? `AS${j.asn}` : "---",
+          city: j.city,
+          country: j.country,
+          lat: parseFloat(j.latitude),
+          lon: parseFloat(j.longitude),
+          flag: j.country_code
+            ? `https://flagcdn.com/w80/${j.country_code.toLowerCase()}.png`
+            : "",
+          source: "geojs.io",
+        }),
+      },
+      {
+        name: "ipwho.is",
+        url: `https://ipwho.is/`,
+        parse: (j) => {
+          if (!j.success) throw new Error("API Limit");
+          return {
+            ip: j.ip,
+            isp: j.connection?.isp || "Unknown",
+            org: j.continent || "Unknown",
+            asn: j.connection?.asn ? `AS${j.connection.asn}` : "---",
+            city: j.city,
+            country: j.country,
+            lat: j.latitude,
+            lon: j.longitude,
+            flag: j.flag?.img || "",
+            source: "ipwho.is",
+          };
+        },
+      },
+      {
+        name: "freeipapi.com",
+        url: `https://free.freeipapi.com/api/json`,
+        parse: (j) => ({
+          ip: j.ipAddress,
+          isp: "Resolved Network",
+          org: j.continent || "Unknown",
+          asn: j.asn || "---",
+          city: j.cityName,
+          country: j.countryName,
+          lat: j.latitude,
+          lon: j.longitude,
+          flag: j.countryCode
+            ? `https://flagcdn.com/w80/${j.countryCode.toLowerCase()}.png`
+            : "",
+          source: "freeipapi.com",
+        }),
+      },
       {
         name: "ipapi.co",
         url: `https://ipapi.co/json/`,
@@ -192,45 +237,8 @@
         }),
       },
       {
-        name: "ipwho.is",
-        url: `https://ipwho.is/?_=${ts}`,
-        parse: (j) => {
-          if (!j.success) throw new Error("API Limit Reached");
-          return {
-            ip: j.ip,
-            isp: j.connection?.isp || "Unknown",
-            org: j.continent || "Unknown",
-            asn: j.connection?.asn ? `AS${j.connection.asn}` : "---",
-            city: j.city,
-            country: j.country,
-            lat: j.latitude,
-            lon: j.longitude,
-            flag: j.flag?.img || "",
-            source: "ipwho.is",
-          };
-        },
-      },
-      {
-        name: "freeipapi.com",
-        url: `https://free.freeipapi.com/api/json?_=${ts}`,
-        parse: (j) => ({
-          ip: j.ipAddress,
-          isp: "Resolved Network",
-          org: j.continent || "Unknown",
-          asn: j.asn || "---",
-          city: j.cityName,
-          country: j.countryName,
-          lat: j.latitude,
-          lon: j.longitude,
-          flag: j.countryCode
-            ? `https://flagcdn.com/w80/${j.countryCode.toLowerCase()}.png`
-            : "",
-          source: "freeipapi.com",
-        }),
-      },
-      {
         name: "api.ip2location.io",
-        url: `https://api.ip2location.io/?_=${ts}`,
+        url: `https://api.ip2location.io/`,
         parse: (j) => ({
           ip: j.ip,
           isp: j.isp || "Unknown",
@@ -248,7 +256,7 @@
       },
       {
         name: "api.db-ip.com",
-        url: `https://api.db-ip.com/v2/free/self?_=${ts}`,
+        url: `https://api.db-ip.com/v2/free/self`,
         parse: (j) => ({
           ip: j.ipAddress,
           isp: j.isp || "Unknown",
@@ -266,22 +274,21 @@
       },
     ];
 
-    // 1. Initialize Request Promises
+    // --- 1. Request Initiation ---
     const requestPromises = richProviders.map(async (p) => {
       const start = performance.now();
       try {
-        // 'no-referrer' helps bypass some strict CORS configs on public APIs
         const res = await fetch(p.url, {
           signal: AbortSignal.timeout(8000),
-          cache: "no-store",
-          referrerPolicy: "no-referrer",
+          cache: "no-store", // Bypass browser cache
+          referrerPolicy: "no-referrer", // Mimic direct navigation
         });
 
-        if (!res.ok) throw new Error(res.status);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         const data = p.parse(json);
 
-        if (!data || !data.ip) throw new Error("Empty Data");
+        if (!data || !data.ip) throw new Error("Invalid Data");
 
         return {
           status: "success",
@@ -290,7 +297,7 @@
           data: data,
         };
       } catch (err) {
-        // Return structured error for the audit log
+        // Return object for logging instead of throwing
         throw {
           status: "error",
           time: performance.now() - start,
@@ -300,7 +307,7 @@
       }
     });
 
-    // 2. Race Condition: Display Fastest Winner
+    // --- 2. The Race (Fastest Wins UI) ---
     let winnerProvider = null;
     let initialData = null;
 
@@ -309,14 +316,14 @@
       winnerProvider = winner.provider;
       initialData = winner.data;
 
-      // Immediate UI Update
+      // Immediate UI update with the winner's data
       finishUpdate(winner.data, globalStart);
       if (logSummary)
         logSummary.innerText = `SRC: ${winner.provider} (Details)`;
     } catch (aggError) {
-      // Fallback: If all Tier 1 APIs fail (usually due to corporate firewall)
+      // Fallback: If ALL rich providers fail (e.g. offline or strict firewall)
       try {
-        const fbRes = await fetch(`https://api.ipify.org/?format=json&_=${ts}`);
+        const fbRes = await fetch(`https://api.ipify.org/?format=json`);
         const fbJson = await fbRes.json();
         const fbData = {
           ip: fbJson.ip,
@@ -333,9 +340,10 @@
         finishUpdate(fbData, globalStart);
         if (logSummary) logSummary.innerText = "SRC: IPIFY (FALLBACK)";
       } catch (e) {
+        // Fatal Error
         ipEl.innerText = "OFFLINE";
         ipEl.style.color = "var(--accent-red)";
-        ispEl.innerText = "Connection blocked.";
+        ispEl.innerText = "Connection blocked or offline.";
         if (logSummary) logSummary.innerText = "SRC: FAILED";
       }
     } finally {
@@ -343,7 +351,7 @@
         setTimeout(() => refreshIcon.classList.remove("fa-spin"), 500);
     }
 
-    // 3. Audit & Merge: Wait for slower APIs to fill in gaps
+    // --- 3. The Audit (Merge Data & Log) ---
     Promise.allSettled(requestPromises).then((results) => {
       if (!logList) return;
       logList.innerHTML = "";
@@ -357,7 +365,7 @@
           const val = res.value;
           const isWinner = val.provider === winnerProvider;
 
-          // Merge Strategy: If winner had empty fields, fill them from slower providers
+          // Data Merging: Fill gaps in the winner's data using slower providers
           if (mergedData && !isWinner) {
             if (isMissing(mergedData.city) && !isMissing(val.data.city)) {
               mergedData.city = val.data.city;
@@ -375,15 +383,15 @@
               mergedData.org = val.data.org;
               didMerge = true;
             }
+            if (isMissing(mergedData.flag) && !isMissing(val.data.flag)) {
+              mergedData.flag = val.data.flag;
+              didMerge = true;
+            }
 
-            // Prefer coordinates from providers that actually return them
+            // Prefer coordinates from valid providers
             if (mergedData.lat === 0 && val.data.lat !== 0) {
               mergedData.lat = val.data.lat;
               mergedData.lon = val.data.lon;
-              didMerge = true;
-            }
-            if (isMissing(mergedData.flag) && !isMissing(val.data.flag)) {
-              mergedData.flag = val.data.flag;
               didMerge = true;
             }
           }
@@ -392,7 +400,7 @@
           const statusText = isWinner ? "WINNER" : "VALID";
           item = createLogItem(val.provider, statusText, statusClass, val.time);
         } else {
-          // Render failed request in log
+          // Log Failed Request
           const reason = res.reason;
           item = createLogItem(
             reason.provider || "Unknown",
@@ -404,7 +412,7 @@
         logList.appendChild(item);
       });
 
-      // Update UI again if we found better data
+      // If data was enriched, update the UI a second time
       if (didMerge && mergedData) {
         finishUpdate(mergedData, globalStart);
         if (logSummary)
@@ -414,7 +422,7 @@
   };
 
   // ==========================================================================
-  // UI RENDERING
+  // UI RENDERING HELPERS
   // ==========================================================================
 
   const createLogItem = (name, status, cssClass, time) => {
@@ -431,21 +439,21 @@
   };
 
   const finishUpdate = (data, startTime) => {
-    // Elements
     const timeEl = document.getElementById("echo-latency");
     const ipEl = document.getElementById("user-ip");
     const ispEl = document.getElementById("user-isp");
 
-    // 1. Latency & IP
+    // Update Latency
     const endTime = performance.now();
     if (timeEl)
       timeEl.innerText = `[ LATENCY: ${(endTime - startTime).toFixed(0)}ms ]`;
 
+    // Update IP & ISP
     ipEl.innerText = data.ip;
     ipEl.style.color = "var(--accent-gold)";
     ispEl.innerText = data.isp;
 
-    // 2. Metadata
+    // Update Metadata
     safeSet("user-loc", () =>
       !isMissing(data.city) ? `${data.city}, ${data.country}` : data.country,
     );
@@ -453,18 +461,17 @@
     safeSet("user-domain", () => "---");
     safeSet("user-asn", () => data.asn);
 
-    // 3. Flag
+    // Update Flag
     const flagEl = document.getElementById("user-flag");
     if (flagEl && data.flag) {
       flagEl.src = data.flag;
       flagEl.style.display = "block";
-      // Handle broken flag links gracefully
       flagEl.onerror = () => {
         flagEl.style.display = "none";
       };
     }
 
-    // 4. Map
+    // Update Map
     if (data.lat !== 0 && data.lon !== 0) {
       mapCoords = { lat: data.lat, lon: data.lon };
       updateMap(data.lat, data.lon);
@@ -476,7 +483,7 @@
       }
     }
 
-    // 5. Enable Copy Button
+    // Enable Copy Button
     const copyBtn = document.getElementById("copy-ip-btn");
     if (copyBtn) {
       copyBtn.style.display = "block";
@@ -497,9 +504,9 @@
 
     const isLight = document.body.classList.contains("light-theme");
 
-    // Map Config: Zoom buttons hidden, but interaction enabled
+    // Leaflet Configuration
     echoMap = L.map("map", {
-      zoomControl: false,
+      zoomControl: false, // UI buttons hidden
       attributionControl: false,
       dragging: true,
       scrollWheelZoom: true,
@@ -521,11 +528,11 @@
   };
 
   // ==========================================================================
-  // INITIALIZATION
+  // MODULE INITIALIZATION
   // ==========================================================================
 
   const init = () => {
-    // Only run if elements exist (SPA check)
+    // SPA Check: Ensure we are on the echo page
     if (!document.getElementById("user-ip")) return;
 
     getBrowserData();
@@ -540,12 +547,12 @@
       };
     }
 
-    // Listen for Theme Toggle to repaint map
+    // Listen for Theme Toggle (Repaint Map)
     document.removeEventListener("themeChanged", handleThemeChange);
     document.addEventListener("themeChanged", handleThemeChange);
   };
 
-  // Attach to Router and Window events
+  // Lifecycle Hooks
   document.addEventListener("spa-content-loaded", init);
   document.addEventListener("DOMContentLoaded", init);
 })();
