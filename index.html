@@ -5,12 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VindE | Home</title>
 
-    <!-- 1. PRECONNECT: Establish early handshakes -->
+    <!-- 1. PRECONNECT: Establish handshakes to CDNs immediately -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link rel="preconnect" href="https://unpkg.com" />
 
-    <!-- 2. ICON FONT PRELOAD: Fixed "squares" issue by loading files immediately -->
+    <!-- 2. CRITICAL CSS: Inlined to achieve sub-second First Contentful Paint (FCP) -->
+    <style>
+      :root {
+        --bg: #0a0a0c;
+        --text: #eeeeee;
+        --accent-gold: #ffc107;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        margin: 0;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .intro {
+        height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 10%;
+        opacity: 0;
+        animation: fadeIn 0.8s forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      #header-placeholder {
+        min-height: 80px;
+      }
+      #page-content {
+        opacity: 0;
+      }
+      #page-content.loaded {
+        opacity: 1;
+      }
+    </style>
+
+    <!-- 3. PRELOAD: High-priority assets -->
+    <link rel="preload" href="/assets/css/style.css" as="style" />
+    <link rel="preload" href="/assets/js/script.js" as="script" />
     <link
       rel="preload"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/webfonts/fa-solid-900.woff2"
@@ -18,80 +64,41 @@
       type="font/woff2"
       crossorigin
     />
-    <link
-      rel="preload"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/webfonts/fa-brands-400.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
 
-    <!-- 3. CSS PRELOAD: Parallel download for modular stylesheets -->
-    <link rel="preload" href="/assets/css/style.css" as="style" />
-    <link rel="preload" href="/assets/css/header.css" as="style" />
-    <link rel="preload" href="/assets/js/script.js" as="script" />
-    <link rel="preload" href="/assets/js/router.js" as="script" />
-
-    <!-- Meta Tags -->
-    <meta
-      name="description"
-      content="VindE - Personal portfolio featuring Windows software, SnapDNS, C# projects, and Godot games."
-    />
-    <meta
-      name="keywords"
-      content="VindE, VindEi, Software, SnapDNS, C#, Godot, Open Source, Portfolio"
-    />
-    <meta name="author" content="VindE" />
-    <meta property="og:title" content="VindE | Software & Games" />
-    <meta
-      property="og:description"
-      content="Creating Windows software and random games."
-    />
-    <meta property="og:image" content="https://vinde.me/assets/img/logo.png" />
-    <meta name="theme-color" content="#ffc107" />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/assets/img/logo.png" />
-
-    <!-- Google Fonts: display=fallback prevents jarring font swaps -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=fallback"
-      rel="stylesheet"
-    />
-
-    <!-- Stylesheets -->
+    <!-- 4. GLOBAL STYLES: Essential for every page -->
     <link rel="stylesheet" href="/assets/css/style.css" />
     <link rel="stylesheet" href="/assets/css/header.css" />
     <link rel="stylesheet" href="/assets/css/footer.css" />
     <link rel="stylesheet" href="/assets/css/cursor.css" />
-    <link rel="stylesheet" href="/assets/css/projects.css" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
       crossorigin="anonymous"
-      referrerpolicy="no-referrer"
     />
+
+    <!-- FONTS -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Meta Tags -->
+    <meta
+      name="description"
+      content="VindE - Personal portfolio featuring Windows software and Godot games."
+    />
+    <link rel="icon" type="image/png" href="/assets/img/logo.png" />
   </head>
   <body>
-    <!-- Containers for Dynamic Content -->
     <div id="header-placeholder"></div>
     <main id="page-content"></main>
     <div id="footer-placeholder"></div>
 
-    <!-- Scripts -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      defer
-    ></script>
+    <!-- Core Logic (Deferred to prevent blocking) -->
     <script src="/assets/js/script.js" defer></script>
     <script src="/assets/js/router.js" defer></script>
     <script src="/assets/js/cursor.js" defer></script>
-    <script src="/assets/js/projects.js" defer></script>
-    <script src="/assets/js/error.js" defer></script>
     <script src="/assets/js/echo.js" defer></script>
+    <script src="/assets/js/projects.js" defer></script>
   </body>
 </html>
