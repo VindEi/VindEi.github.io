@@ -1,5 +1,18 @@
-/* --- VARIABLES --- */
+/**
+ * VindE - Global Stylesheet
+ * 
+ * Features:
+ * 1. Dual-theme support with optimized variable mapping.
+ * 2. Performance-first font stacks to eliminate layout thrashing.
+ * 3. Component-specific transitions for a premium UI feel.
+ */
+
+/* ==========================================================================
+   1. VARIABLES & THEMES
+   ========================================================================== */
+
 :root {
+  /* DARK THEME (Default) */
   --bg: #0a0a0c;
   --surface: #141416;
   --text: #eeeeee;
@@ -7,36 +20,30 @@
   --accent-gold: #ffc107;
   --accent-red: #ff3b5c;
   --border-color: rgba(255, 255, 255, 0.05);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 body.light-theme {
+  /* LIGHT THEME */
   --bg: #ffffff;
   --surface: #f2f2f2;
   --text: #000000;
   --text-dim: #555555;
+  --accent-gold: #ffc107;
+  --accent-red: #ff3b5c;
   --border-color: rgba(0, 0, 0, 0.1);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-/* --- SCROLLBAR --- */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-gold);
-}
+/* ==========================================================================
+   2. GLOBAL RESET & LAYOUT
+   ========================================================================== */
 
-/* --- RESET & GLOBAL LAYOUT --- */
 * {
   box-sizing: border-box;
-  cursor: none !important;
+  cursor: none !important; /* Enforces custom cursor utility */
 }
+
 html {
   scroll-behavior: smooth !important;
 }
@@ -48,7 +55,7 @@ html {
   height: 100%;
   background-color: var(--bg);
   color: var(--text);
-  /* OPTIMIZED: System stack fallback for Inter */
+  /* Optimized system font fallbacks prevent FOUT (Flash of Unstyled Text) */
   font-family:
     "Inter",
     -apple-system,
@@ -67,7 +74,7 @@ body {
   min-height: 100vh;
 }
 
-/* Transitions */
+/* Centralized transition logic for theme-sensitive components */
 header,
 footer,
 .feature-card,
@@ -83,16 +90,35 @@ footer,
     box-shadow 0.3s ease;
 }
 
-/* --- LAYOUT CONTAINERS & FADE LOGIC --- */
-#header-placeholder {
-  z-index: 100;
-  position: relative;
-  min-height: 80px;
-  opacity: 0;
+/* --- CUSTOM SCROLLBAR --- */
+::-webkit-scrollbar {
+  width: 8px;
 }
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
+}
+
+/* ==========================================================================
+   3. CONTAINERS & TRANSITIONS
+   ========================================================================== */
+
+#header-placeholder,
 #footer-placeholder {
-  min-height: 60px;
   opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Initialized via script.js upon successful fetch */
+body.loaded #header-placeholder,
+body.loaded #footer-placeholder {
+  opacity: 1;
 }
 
 #page-content {
@@ -104,20 +130,14 @@ footer,
   display: flex;
   flex-direction: column;
 
-  /* Hides FOUT (Flash of Unstyled Text) */
+  /* Hidden state to manage FOUT and layout shifts during SPA navigation */
   opacity: 0;
   visibility: hidden;
-  transform: translateY(15px);
+  transform: translateY(20px);
   transition:
-    opacity 0.5s ease,
-    transform 0.5s ease,
-    visibility 0.5s;
-}
-
-/* Reveal once script.js confirms component & font load */
-body.loaded #header-placeholder,
-body.loaded #footer-placeholder {
-  opacity: 1;
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    visibility 0.4s;
 }
 
 #page-content.loaded {
@@ -126,11 +146,14 @@ body.loaded #footer-placeholder {
   transform: translateY(0);
 }
 
-/* --- TYPOGRAPHY --- */
+/* ==========================================================================
+   4. TYPOGRAPHY & UI
+   ========================================================================== */
+
 h1,
 h2,
 h3 {
-  /* OPTIMIZED: Fallback set to Arial Narrow to match condensed width of Oswald */
+  /* Arial Narrow fallback used to match condensed width of Oswald */
   font-family:
     "Oswald", "Arial Narrow", "Helvetica Neue", Helvetica, sans-serif-condensed,
     sans-serif;
@@ -164,7 +187,6 @@ a:hover {
   color: var(--accent-gold);
 }
 
-/* --- UI COMPONENTS --- */
 .btn {
   display: inline-block;
   padding: 10px 24px;
@@ -176,13 +198,17 @@ a:hover {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+
 .btn:hover {
   background: var(--accent-gold);
   color: #000;
   box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
 }
 
-/* --- HOME PAGE ANIMATIONS --- */
+/* ==========================================================================
+   5. HOME PAGE CONTENT
+   ========================================================================== */
+
 .intro {
   height: 60vh;
   min-height: 400px;
@@ -230,19 +256,51 @@ a:hover {
   animation: heroEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.5s;
 }
 
+/* --- CENTERED MINIMALIST HINTS --- */
 .hint {
-  margin-top: 3rem;
+  margin-top: 4rem; /* Spaced further down to act as a section anchor */
+  width: 100%;
+  margin-left: -5%; /* Optical centering offset: negates half of the parent's 10% padding */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px; /* Generous gap for premium editorial feel */
+
   font-family: "Oswald", sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 5px; /* High tracking for minimalist elegance */
+
+  opacity: 0;
+  animation: heroEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.8s;
+}
+
+.hint-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  opacity: 0;
-  animation: heroEnter 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.7s;
+  gap: 12px;
+  opacity: 0.5;
+  transition:
+    opacity 0.3s ease,
+    color 0.3s ease;
 }
+
+.hint-item:hover {
+  opacity: 1;
+  color: var(--text);
+}
+
+.hint-item i {
+  color: var(--accent-gold);
+  font-size: 0.8rem;
+  animation: hintBreathe 3s infinite ease-in-out;
+}
+
+/* ==========================================================================
+   6. ANIMATION KEYFRAMES
+   ========================================================================== */
 
 @keyframes heroEnter {
   0% {
@@ -257,6 +315,20 @@ a:hover {
   }
 }
 
+@keyframes hintBreathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ==========================================================================
+   7. RESPONSIVENESS
+   ========================================================================== */
+
 @media (max-width: 768px) {
   .intro {
     padding-left: 0;
@@ -268,5 +340,18 @@ a:hover {
   }
   .desc {
     padding: 0 20px;
+  }
+  .hint {
+    margin-left: 0;
+    margin-top: 3.5rem;
+    gap: 30px;
+    letter-spacing: 3px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 900px) {
+  #page-content {
+    padding-top: 100px;
   }
 }
