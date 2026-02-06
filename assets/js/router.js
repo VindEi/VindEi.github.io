@@ -1,12 +1,14 @@
+/**
+ * Single Page Application (SPA) Router
+ * Intercepts link clicks and manages dynamic content injection.
+ */
 document.addEventListener("DOMContentLoaded", () => {
   const main = document.getElementById("page-content");
-  const headerPlaceholder = document.getElementById("header-placeholder");
-  const footerPlaceholder = document.getElementById("footer-placeholder");
+  const header = document.getElementById("header-placeholder");
+  const footer = document.getElementById("footer-placeholder");
 
-  // State to track if header HTML is injected
   let isNavReady = false;
 
-  // --- CONFIGURATION ---
   const routes = {
     "/": "/pages/home.html",
     "/projects": "/pages/projects.html",
@@ -21,103 +23,89 @@ document.addEventListener("DOMContentLoaded", () => {
     "/echo": "VindE | Echo",
   };
 
-  // --- NAVIGATION HIGHLIGHT LOGIC ---
+  /**
+   * Updates visual 'active' state in navigation menus.
+   */
   function updateActiveNav(path) {
-    if (!isNavReady) return; // Wait for header to exist
+    if (!isNavReady) return;
 
-    // 1. Clean up old active states
-    document.querySelectorAll(".header-nav a, .echo-btn").forEach((el) => {
-      el.classList.remove("active");
-    });
+    document
+      .querySelectorAll(".header-nav a, .echo-btn")
+      .forEach((el) => el.classList.remove("active"));
 
-    // 2. Highlight Header Links
     document.querySelectorAll(".header-nav a").forEach((link) => {
       const href = link.getAttribute("href");
-
-      // Exact match OR Subpage match (excluding root "/")
-      const isSubPage = href !== "/" && path.startsWith(href);
-
-      if (href === path || isSubPage) {
-        link.classList.add("active");
-      }
+      const isMatch = href === path || (href !== "/" && path.startsWith(href));
+      if (isMatch) link.classList.add("active");
     });
 
-    // 3. Highlight Footer Echo Button
     const echoBtn = document.querySelector(".echo-btn");
-    if (echoBtn && path === "/echo") {
-      echoBtn.classList.add("active");
-    }
+    if (echoBtn && path === "/echo") echoBtn.classList.add("active");
   }
 
-  // --- EVENT: Listen for Component Loader (from script.js) ---
+  // Hook into componentsLoaded signal from script.js
   window.addEventListener("componentsLoaded", () => {
     isNavReady = true;
-    updateActiveNav(location.pathname); // Sync nav immediately on load
+    updateActiveNav(location.pathname);
   });
 
-  // --- MAIN PAGE LOADER ---
+  /**
+   * Main Page Loader
+   * Handles path normalization, metadata updates, and content injection.
+   */
   async function loadPage(path) {
-    // 1. Normalize Path
+    // Normalize clean URL paths
     let cleanPath =
       path.length > 1 && path.endsWith("/") ? path.slice(0, -1) : path;
     if (cleanPath === "" || cleanPath === "/index.html") cleanPath = "/";
 
-    // 2. Update Metadata
     document.title = titles[cleanPath] || "VindE | 404";
-
-    // 3. Update Nav (if header is ready, otherwise event listener handles it)
     updateActiveNav(cleanPath);
 
-    // 4. Determine Route
     const route = routes[cleanPath] || "/404.html";
     const is404 = route === "/404.html";
 
-    // 5. Hide/Show Header & Footer based on 404 state
-    if (headerPlaceholder)
-      headerPlaceholder.style.display = is404 ? "none" : "block";
-    if (footerPlaceholder)
-      footerPlaceholder.style.display = is404 ? "none" : "block";
+    // Manage UI visibility for error states
+    if (header) header.style.display = is404 ? "none" : "block";
+    if (footer) footer.style.display = is404 ? "none" : "block";
 
-    // 6. Fetch Content
     try {
       const res = await fetch(route);
-      if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+      if (!res.ok) throw new Error("HTTP_404");
 
       const rawHtml = await res.text();
       let content = rawHtml;
 
-      // PARSING: Extract .bsod-container or body content if fetching a full HTML file
-      if (rawHtml.includes("<html") || rawHtml.includes("bsod-container")) {
+      // Extract specific content container if loading a full HTML document
+      if (rawHtml.includes("bsod-container")) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(rawHtml, "text/html");
-        const container = doc.querySelector(".bsod-container");
-        content = container ? container.outerHTML : doc.body.innerHTML;
+        content = doc.querySelector(".bsod-container").outerHTML;
       }
 
-      // 7. Inject & Animate
-      main.classList.remove("loaded"); // Fade out
+      // Smooth Animation: Fade Out -> Swap -> Fade In
+      main.classList.remove("loaded");
 
-      // Small delay for CSS transition
       setTimeout(() => {
         main.innerHTML = content;
         void main.offsetWidth; // Force Reflow
-        main.classList.add("loaded"); // Fade in
+        main.classList.add("loaded");
 
-        // Dispatch Event for page-specific scripts (Projects/Echo)
+        // Notify page-specific scripts (Echo map, Project cards)
         document.dispatchEvent(new Event("spa-content-loaded"));
       }, 200);
     } catch (err) {
-      console.error("Router Error:", err);
-      // Fallback 404 injection
-      main.innerHTML = `<div style="text-align:center; padding: 50px;"><h1>404 // DATA_CORRUPTED</h1><p>The requested route could not be resolved.</p><a href="/" class="btn">RETURN_HOME</a></div>`;
+      console.error("[Router] Route resolution failed:", err);
+      main.innerHTML = `<div style="text-align:center; padding:100px;"><h1>ERROR_FETCH_FAILED</h1><a href="/" class="btn">REBOOT_SYSTEM</a></div>`;
       main.classList.add("loaded");
     }
   }
 
-  // --- INTERACTION HANDLERS ---
+  // --- Interaction Event Listeners ---
+
   document.body.addEventListener("click", (e) => {
     const link = e.target.closest("a");
-    // Intercept local links only
+    // Intercept internal links while permitting external targets to function normally
     if (
       link &&
       link.getAttribute("href")?.startsWith("/") &&
@@ -130,9 +118,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Handle Back/Forward Browser Buttons
   window.addEventListener("popstate", () => loadPage(location.pathname));
 
-  // Initial Load
+  // Initialize initial path resolution
   loadPage(location.pathname);
 });

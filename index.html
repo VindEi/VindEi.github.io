@@ -5,7 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VindE | Home</title>
 
-    <!--  Meta Description & Keywords -->
+    <!-- 1. PRECONNECT: Establish early handshakes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" />
+
+    <!-- 2. ICON FONT PRELOAD: Fixed "squares" issue by loading files immediately -->
+    <link
+      rel="preload"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/webfonts/fa-solid-900.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/webfonts/fa-brands-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- 3. CSS PRELOAD: Parallel download for modular stylesheets -->
+    <link rel="preload" href="/assets/css/style.css" as="style" />
+    <link rel="preload" href="/assets/css/header.css" as="style" />
+    <link rel="preload" href="/assets/js/script.js" as="script" />
+    <link rel="preload" href="/assets/js/router.js" as="script" />
+
+    <!-- Meta Tags -->
     <meta
       name="description"
       content="VindE - Personal portfolio featuring Windows software, SnapDNS, C# projects, and Godot games."
@@ -15,25 +42,20 @@
       content="VindE, VindEi, Software, SnapDNS, C#, Godot, Open Source, Portfolio"
     />
     <meta name="author" content="VindE" />
-
-    <!--  Open Graph (Social Media) -->
     <meta property="og:title" content="VindE | Software & Games" />
     <meta
       property="og:description"
       content="Creating Windows software and random games."
     />
     <meta property="og:image" content="https://vinde.me/assets/img/logo.png" />
-    <meta property="og:url" content="https://vinde.me" />
-    <meta property="og:type" content="website" />
     <meta name="theme-color" content="#ffc107" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/assets/img/logo.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Google Fonts: display=fallback prevents jarring font swaps -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=fallback"
       rel="stylesheet"
     />
 
@@ -50,28 +72,23 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
     />
   </head>
   <body>
-    <!-- Header Container -->
+    <!-- Containers for Dynamic Content -->
     <div id="header-placeholder"></div>
-
-    <!-- Dynamic Content Area -->
     <main id="page-content"></main>
-
-    <!-- Footer Container -->
     <div id="footer-placeholder"></div>
 
+    <!-- Scripts -->
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       defer
     ></script>
-
-    <!-- Core Scripts -->
     <script src="/assets/js/script.js" defer></script>
     <script src="/assets/js/router.js" defer></script>
-
-    <!-- Feature Scripts -->
     <script src="/assets/js/cursor.js" defer></script>
     <script src="/assets/js/projects.js" defer></script>
     <script src="/assets/js/error.js" defer></script>
