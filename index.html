@@ -5,21 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VindE | Home</title>
 
-    <!-- 1. PRECONNECT: Faster handshakes -->
+    <!-- 1. PRECONNECT: Establish connections to CDNs early -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
 
-    <!-- 2. RESOURCE PRELOADING: Fixes the 11s delay by downloading in parallel -->
+    <!-- 2. RESOURCE PRELOADING: Parallel downloads to fix the 13s delay -->
     <link rel="preload" href="/assets/css/style.css" as="style" />
     <link rel="preload" href="/assets/js/script.js" as="script" />
     <link rel="preload" href="/assets/js/router.js" as="script" />
-    <link
-      rel="preload"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/webfonts/fa-solid-900.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
 
     <!-- Meta Tags -->
     <meta
@@ -29,13 +22,7 @@
     <meta name="theme-color" content="#ffc107" />
     <link rel="icon" type="image/png" href="/assets/img/logo.png" />
 
-    <!-- Fonts: display=fallback prevents the fat-font layout jump -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=fallback"
-      rel="stylesheet"
-    />
-
-    <!-- Stylesheets: Standard loading for maximum compatibility -->
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="/assets/css/style.css" />
     <link rel="stylesheet" href="/assets/css/header.css" />
     <link rel="stylesheet" href="/assets/css/footer.css" />
@@ -50,23 +37,29 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
       crossorigin="anonymous"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Oswald:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <!-- App Skeleton -->
+    <!-- Component Placeholders -->
     <div id="header-placeholder"></div>
+
     <main id="page-content"></main>
+
     <div id="footer-placeholder"></div>
 
-    <!-- Scripts -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      defer
-    ></script>
+    <!-- Scripts: order is important -->
     <script src="/assets/js/script.js" defer></script>
     <script src="/assets/js/router.js" defer></script>
     <script src="/assets/js/cursor.js" defer></script>
     <script src="/assets/js/projects.js" defer></script>
     <script src="/assets/js/error.js" defer></script>
     <script src="/assets/js/echo.js" defer></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      defer
+    ></script>
   </body>
 </html>
